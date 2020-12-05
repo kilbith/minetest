@@ -677,7 +677,7 @@ void GUIFormSpecMenu::parseScrollBar(parserData* data, const std::string &elemen
 
 		spec.ftype = f_ScrollBar;
 		spec.send  = true;
-		GUIScrollBar *e = new GUIScrollBar(Environment, data->current_parent,
+		GUIScrollBar *e = new GUIScrollBar(m_tsrc, Environment, data->current_parent,
 				spec.fid, rect, is_horizontal, true);
 
 		auto style = getDefaultStyleForElement("scrollbar", name);

@@ -13,6 +13,10 @@ the arrow buttons where there is insufficient space.
 #pragma once
 
 #include "irrlichttypes_extrabloated.h"
+#include "client/tile.h"
+#include "client/renderingengine.h"
+#include "IGUIImage.h"
+#include "client/guiscalingfilter.h"
 
 using namespace irr;
 using namespace gui;
@@ -20,8 +24,9 @@ using namespace gui;
 class GUIScrollBar : public IGUIElement
 {
 public:
-	GUIScrollBar(IGUIEnvironment *environment, IGUIElement *parent, s32 id,
-			core::rect<s32> rectangle, bool horizontal, bool auto_scale);
+	GUIScrollBar(ISimpleTextureSource *tsrc, IGUIEnvironment *environment,
+		IGUIElement *parent, s32 id, core::rect<s32> rectangle,
+		bool horizontal, bool auto_scale);
 
 	enum ArrowVisibility
 	{
@@ -52,6 +57,13 @@ private:
 	void refreshControls();
 	s32 getPosFromMousePos(const core::position2di &p) const;
 	f32 range() const { return f32(max_pos - min_pos); }
+
+	ISimpleTextureSource *m_tsrc = nullptr;
+	video::ITexture *m_texture_blank = nullptr;
+	video::ITexture *m_texture_thumb = nullptr;
+	gui::IGUIImage *m_image_thumb = nullptr;
+	video::ITexture *m_texture_slider = nullptr;
+	gui::IGUIImage *m_image_slider = nullptr;
 
 	IGUIButton *up_button;
 	IGUIButton *down_button;
