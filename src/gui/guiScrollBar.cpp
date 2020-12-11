@@ -14,11 +14,10 @@ the arrow buttons where there is insufficient space.
 #include <IGUIButton.h>
 #include <IGUISkin.h>
 
-GUIScrollBar::GUIScrollBar(ISimpleTextureSource *tsrc, IGUIEnvironment *environment,
-		IGUIElement *parent, s32 id,
+GUIScrollBar::GUIScrollBar(IGUIEnvironment *environment, IGUIElement *parent, s32 id,
 		core::rect<s32> rectangle, bool horizontal, bool auto_scale) :
 		IGUIElement(EGUIET_ELEMENT, environment, parent, id, rectangle),
-		m_tsrc(tsrc), up_button(nullptr), down_button(nullptr), is_dragging(false),
+		up_button(nullptr), down_button(nullptr), is_dragging(false),
 		is_horizontal(horizontal), is_auto_scaling(auto_scale),
 		dragged_by_slider(false), tray_clicked(false), scroll_pos(0),
 		draw_center(0), thumb_size(0), min_pos(0), max_pos(100), small_step(10),
@@ -29,13 +28,6 @@ GUIScrollBar::GUIScrollBar(ISimpleTextureSource *tsrc, IGUIEnvironment *environm
 	setTabStop(true);
 	setTabOrder(-1);
 	setPos(0);
-
-	if (tsrc) {
-		m_texture_blank = tsrc->getTexture("blank.png");
-		m_texture_thumb = tsrc->getTexture("thumb.png");
-		m_texture_slider = tsrc->getTexture("slider.png");
-	}
-
 }
 
 bool GUIScrollBar::OnEvent(const SEvent &event)
@@ -216,8 +208,8 @@ void GUIScrollBar::draw()
 		refreshControls();
 
 	slider_rect = AbsoluteRect;
-	//skin->draw2DRectangle(this, skin->getColor(EGDC_SCROLLBAR), slider_rect,
-	//		&AbsoluteClippingRect);
+	skin->draw2DRectangle(this, skin->getColor(EGDC_SCROLLBAR), slider_rect,
+			&AbsoluteClippingRect);
 
 	if (core::isnotzero(range())) {
 		if (is_horizontal) {
@@ -231,23 +223,7 @@ void GUIScrollBar::draw()
 			slider_rect.LowerRightCorner.Y =
 					slider_rect.UpperLeftCorner.Y + thumb_size;
 		}
-		//skin->draw3DButtonPaneStandard(this, slider_rect, &AbsoluteClippingRect);
-		
-		if (m_texture_thumb) {
-			m_image_slider = Environment->addImage(
-				core::rect<s32>(0, 0, AbsoluteRect.getWidth(), AbsoluteRect.LowerRightCorner.Y), this);
-			m_image_slider->setImage(m_texture_slider);
-			m_image_slider->setScaleImage(true);
-
-			if (m_image_thumb)
-				m_image_thumb->setImage(m_texture_blank);
-
-			m_image_thumb = Environment->addImage(
-				core::rect<s32>(0, scroll_pos, thumb_size, scroll_pos + thumb_size), this);
-			m_image_thumb->setImage(m_texture_thumb);
-			m_image_thumb->setScaleImage(true);
-		}
-
+		skin->draw3DButtonPaneStandard(this, slider_rect, &AbsoluteClippingRect);
 	}
 	IGUIElement::draw();
 }
