@@ -148,7 +148,7 @@ std::string PlayerSAO::getClientInitializationData(u16 protocol_version)
 
 void PlayerSAO::getStaticData(std::string * result) const
 {
-	FATAL_ERROR("Obsolete function");
+	FATAL_ERROR("This function shall not be called for PlayerSAO");
 }
 
 void PlayerSAO::step(float dtime, bool send_recommended)
@@ -456,6 +456,11 @@ u16 PlayerSAO::punch(v3f dir,
 	return hitparams.wear;
 }
 
+void PlayerSAO::rightClick(ServerActiveObject *clicker)
+{
+	m_env->getScriptIface()->on_rightclickplayer(this, clicker);
+}
+
 void PlayerSAO::setHP(s32 hp, const PlayerHPChangeReason &reason)
 {
 	if (hp == (s32)m_hp)
@@ -531,7 +536,7 @@ bool PlayerSAO::setWieldedItem(const ItemStack &item)
 void PlayerSAO::disconnected()
 {
 	m_peer_id = PEER_ID_INEXISTENT;
-	m_pending_removal = true;
+	markForRemoval();
 }
 
 void PlayerSAO::unlinkPlayerSessionAndSave()

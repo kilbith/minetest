@@ -2113,7 +2113,7 @@ Examples
     list[current_player;main;0,3.5;8,4;]
     list[current_player;craft;3,0;3,3;]
     list[current_player;craftpreview;7,1;1,1;]
-   
+
 Version History
 ---------------
 
@@ -2226,7 +2226,8 @@ Elements
 * Show an inventory list if it has been sent to the client. Nothing will
   be shown if the inventory list is of size 0.
 * **Note**: With the new coordinate system, the spacing between inventory
-  slots is one-fourth the size of an inventory slot.
+  slots is one-fourth the size of an inventory slot by default. Also see
+  [Styling Formspecs] for changing the size of slots and spacing.
 
 ### `list[<inventory location>;<list name>;<X>,<Y>;<W>,<H>;<starting item index>]`
 
@@ -2809,6 +2810,7 @@ Some types may inherit styles from parent types.
 * image_button
 * item_image_button
 * label
+* list
 * model
 * pwdfield, inherits from field
 * scrollbar
@@ -2896,6 +2898,10 @@ Some types may inherit styles from parent types.
     * font - Sets font type. See button `font` property for more information.
     * font_size - Sets font size. See button `font_size` property for more information.
     * noclip - boolean, set to true to allow the element to exceed formspec bounds.
+* list
+    * noclip - boolean, set to true to allow the element to exceed formspec bounds.
+    * size - 2d vector, sets the size of inventory slots in coordinates.
+    * spacing - 2d vector, sets the space between inventory slots in coordinates.
 * image_button (additional properties)
     * fgimg - standard image. Defaults to none.
     * fgimg_hovered - image when hovered. Defaults to fgimg when not provided.
@@ -4207,6 +4213,8 @@ Callbacks:
     * Called when the object is instantiated.
     * `dtime_s` is the time passed since the object was unloaded, which can be
       used for updating the entity state.
+* `on_deactivate(self)
+    * Called when the object is about to get removed or unloaded.
 * `on_step(self, dtime)`
     * Called on every server tick, after movement and collision processing.
       `dtime` is usually 0.1 seconds, as per the `dedicated_server_step` setting
@@ -4327,11 +4335,14 @@ Utilities
 
 * `minetest.get_current_modname()`: returns the currently loading mod's name,
   when loading a mod.
-* `minetest.get_modpath(modname)`: returns e.g.
-  `"/home/user/.minetest/usermods/modname"`.
-    * Useful for loading additional `.lua` modules or static data from mod
-* `minetest.get_modnames()`: returns a list of installed mods
-    * Return a list of installed mods, sorted alphabetically
+* `minetest.get_modpath(modname)`: returns the directory path for a mod,
+  e.g. `"/home/user/.minetest/usermods/modname"`.
+    * Returns nil if the mod is not enabled or does not exist (not installed).
+    * Works regardless of whether the mod has been loaded yet.
+    * Useful for loading additional `.lua` modules or static data from a mod,
+  or checking if a mod is enabled.
+* `minetest.get_modnames()`: returns a list of enabled mods, sorted alphabetically.
+    * Does not include disabled mods, even if they are installed.
 * `minetest.get_worldpath()`: returns e.g. `"/home/user/.minetest/world"`
     * Useful for storing custom data
 * `minetest.is_singleplayer()`
@@ -4582,6 +4593,10 @@ Call these functions only at load time!
       the puncher to the punched.
     * `damage`: Number that represents the damage calculated by the engine
     * should return `true` to prevent the default damage mechanism
+* `minetest.register_on_rightclickplayer(function(player, clicker))`
+    * Called when a player is right-clicked
+    * `player`: ObjectRef - Player that was right-clicked
+    * `clicker`: ObjectRef - Object that right-clicked, may or may not be a player
 * `minetest.register_on_player_hpchange(function(player, hp_change, reason), modifier)`
     * Called when the player gets damaged or healed
     * `player`: ObjectRef of the player
@@ -4891,6 +4906,9 @@ Environment access
 * `minetest.get_objects_inside_radius(pos, radius)`: returns a list of
   ObjectRefs.
     * `radius`: using an euclidean metric
+* `minetest.get_objects_in_area(pos1, pos2)`: returns a list of
+  ObjectRefs.
+     * `pos1` and `pos2` are the min and max positions of the area to search.
 * `minetest.set_timeofday(val)`
     * `val` is between `0` and `1`; `0` for midnight, `0.5` for midday
 * `minetest.get_timeofday()`
@@ -6203,8 +6221,8 @@ object you are working with still exists.
     * `time_from_last_punch` = time since last punch action of the puncher
     * `direction`: can be `nil`
 * `right_click(clicker)`; `clicker` is another `ObjectRef`
-* `get_hp()`: returns number of hitpoints (2 * number of hearts)
-* `set_hp(hp, reason)`: set number of hitpoints (2 * number of hearts).
+* `get_hp()`: returns number of health points
+* `set_hp(hp, reason)`: set number of health points
     * See reason in register_on_player_hpchange
     * Is limited to the range of 0 ... 65535 (2^16 - 1)
     * For players: HP are also limited by `hp_max` specified in the player's
@@ -6227,21 +6245,22 @@ object you are working with still exists.
   `frame_loop`.
 * `set_animation_frame_speed(frame_speed)`
     * `frame_speed`: number, default: `15.0`
-* `set_attach(parent, bone, position, rotation, forced_visible)`
-    * `bone`: string
-    * `position`: `{x=num, y=num, z=num}` (relative)
-    * `rotation`: `{x=num, y=num, z=num}` = Rotation on each axis, in degrees
+* `set_attach(parent[, bone, position, rotation, forced_visible])`
+    * `bone`: string. Default is `""`, the root bone
+    * `position`: `{x=num, y=num, z=num}`, relative, default `{x=0, y=0, z=0}`
+    * `rotation`: `{x=num, y=num, z=num}` = Rotation on each axis, in degrees.
+      Default `{x=0, y=0, z=0}`
     * `forced_visible`: Boolean to control whether the attached entity
-       should appear in first person.
+       should appear in first person. Default `false`.
 * `get_attach()`: returns parent, bone, position, rotation, forced_visible,
     or nil if it isn't attached.
 * `get_children()`: returns a list of ObjectRefs that are attached to the
     object.
 * `set_detach()`
-* `set_bone_position(bone, position, rotation)`
-    * `bone`: string
-    * `position`: `{x=num, y=num, z=num}` (relative)
-    * `rotation`: `{x=num, y=num, z=num}`
+* `set_bone_position([bone, position, rotation])`
+    * `bone`: string. Default is `""`, the root bone
+    * `position`: `{x=num, y=num, z=num}`, relative, `default {x=0, y=0, z=0}`
+    * `rotation`: `{x=num, y=num, z=num}`, default `{x=0, y=0, z=0}`
 * `get_bone_position(bone)`: returns position and rotation of the bone
 * `set_properties(object property table)`
 * `get_properties()`: returns object property table
@@ -6569,8 +6588,8 @@ object you are working with still exists.
     * `frame_speed` sets the animations frame speed. Default is 30.
 * `get_local_animation()`: returns idle, walk, dig, walk_while_dig tables and
   `frame_speed`.
-* `set_eye_offset(firstperson, thirdperson)`: defines offset vectors for camera
-  per player.
+* `set_eye_offset([firstperson, thirdperson])`: defines offset vectors for
+  camera per player. An argument defaults to `{x=0, y=0, z=0}` if unspecified.
     * in first person view
     * in third person view (max. values `{x=-10/10,y=-10,15,z=-5/5}`)
 * `get_eye_offset()`: returns first and third person offsets.
@@ -6926,7 +6945,11 @@ Player properties need to be saved manually.
         -- in mods.
 
         nametag = "",
-        -- By default empty, for players their name is shown if empty
+        -- The name to display on the head of the object. By default empty.
+        -- If the object is a player, a nil or empty nametag is replaced by the player's name.
+        -- For all other objects, a nil or empty string removes the nametag.
+        -- To hide a nametag, set its color alpha to zero. That will disable it entirely.
+
 
         nametag_color = <ColorSpec>,
         -- Sets color of nametag
@@ -7633,12 +7656,12 @@ Used by `minetest.register_node`.
         -- intensity: 1.0 = mid range of regular TNT.
         -- If defined, called when an explosion touches the node, instead of
         -- removing the node.
-        
+
         mod_origin = "modname",
         -- stores which mod actually registered a node
         -- if it can not find a source, returns "??"
         -- useful for getting what mod truly registered something
-        -- example: if a node is registered as ":othermodname:nodename", 
+        -- example: if a node is registered as ":othermodname:nodename",
         -- nodename will show "othermodname", but mod_orgin will say "modname"
     }
 
