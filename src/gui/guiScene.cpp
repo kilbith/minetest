@@ -34,9 +34,6 @@ GUIScene::GUIScene(gui::IGUIEnvironment *env, scene::ISceneManager *smgr,
 	m_cam = m_smgr->addCameraSceneNode(0, v3f(0.f, 0.f, -100.f), v3f(0.f));
 	m_cam->setFOV(30.f * core::DEGTORAD);
 
-	scene::ILightSceneNode *light = m_smgr->addLightSceneNode(m_cam);
-	light->setRadius(1000.f);
-
 	m_smgr->getParameters()->setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);
 }
 
@@ -60,6 +57,8 @@ scene::IAnimatedMeshSceneNode *GUIScene::setMesh(scene::IAnimatedMesh *mesh)
 	m_mesh = m_smgr->addAnimatedMeshSceneNode(mesh);
 	m_mesh->setPosition(-m_mesh->getBoundingBox().getCenter());
 	m_mesh->animateJoints();
+	m_mesh->setAnimationSpeed(30.f);
+
 	return m_mesh;
 }
 
@@ -73,10 +72,13 @@ void GUIScene::setTexture(u32 idx, video::ITexture *texture)
 	material.setFlag(video::EMF_FOG_ENABLE, true);
 	material.setFlag(video::EMF_BILINEAR_FILTER, false);
 	material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+	material.setFlag(video::EMF_ZWRITE_ENABLE, true);
 }
 
 void GUIScene::draw()
 {
+	m_driver->clearBuffers(video::ECBF_DEPTH, video::SColor(255,0,0,0), 1.f, 0);
+
 	// Control rotation speed based on time
 	u64 new_time = porting::getTimeMs();
 	u64 dtime_ms = 0;
