@@ -5773,7 +5773,9 @@ Misc.
     * Example: `minetest.rgba(10, 20, 30, 40)`, returns `"#0A141E28"`
 * `minetest.encode_base64(string)`: returns string encoded in base64
     * Encodes a string in base64.
-* `minetest.decode_base64(string)`: returns string or nil for invalid base64
+* `minetest.decode_base64(string)`: returns string or nil on failure
+    * Padding characters are only supported starting at version 5.4.0, where
+      5.5.0 and newer perform proper checks.
     * Decodes a string encoded in base64.
 * `minetest.is_protected(pos, name)`: returns boolean
     * Returning `true` restricts the player `name` from modifying (i.e. digging,
@@ -5860,6 +5862,19 @@ Misc.
     * stops forceloading the position `pos`
     * If `transient` is `false` or absent, frees a persistent forceload.
       If `true`, frees a transient forceload.
+
+* `minetest.compare_block_status(pos, condition)`
+    * Checks whether the mapblock at positition `pos` is in the wanted condition.
+    * `condition` may be one of the following values:
+        * `"unknown"`: not in memory
+        * `"emerging"`: in the queue for loading from disk or generating
+        * `"loaded"`: in memory but inactive (no ABMs are executed)
+        * `"active"`: in memory and active
+        * Other values are reserved for future functionality extensions
+    * Return value, the comparison status:
+        * `false`: Mapblock does not fulfil the wanted condition
+        * `true`: Mapblock meets the requirement
+        * `nil`: Unsupported `condition` value
 
 * `minetest.request_insecure_environment()`: returns an environment containing
   insecure functions if the calling mod has been listed as trusted in the
