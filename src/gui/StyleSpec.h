@@ -57,6 +57,9 @@ public:
 		SOUND,
 		SPACING,
 		SIZE,
+		UP_ARROW_BGIMG,
+		DOWN_ARROW_BGIMG,
+		THUMB_BGIMG,
 		NUM_PROPERTIES,
 		NONE
 	};
@@ -77,57 +80,62 @@ private:
 public:
 	static Property GetPropertyByName(const std::string &name)
 	{
-		if (name == "textcolor") {
+		if (name == "textcolor")
 			return TEXTCOLOR;
-		} else if (name == "bgcolor") {
+		else if (name == "bgcolor")
 			return BGCOLOR;
-		} else if (name == "bgcolor_hovered") {
+		else if (name == "bgcolor_hovered")
 			return BGCOLOR_HOVERED;
-		} else if (name == "bgcolor_pressed") {
+		else if (name == "bgcolor_pressed")
 			return BGCOLOR_PRESSED;
-		} else if (name == "noclip") {
+		else if (name == "noclip")
 			return NOCLIP;
-		} else if (name == "border") {
+		else if (name == "border")
 			return BORDER;
-		} else if (name == "bgimg") {
+		else if (name == "bgimg")
 			return BGIMG;
-		} else if (name == "bgimg_hovered") {
+		else if (name == "bgimg_hovered")
 			return BGIMG_HOVERED;
-		} else if (name == "bgimg_middle") {
+		else if (name == "bgimg_middle")
 			return BGIMG_MIDDLE;
-		} else if (name == "bgimg_pressed") {
+		else if (name == "bgimg_pressed")
 			return BGIMG_PRESSED;
-		} else if (name == "fgimg") {
+		else if (name == "fgimg")
 			return FGIMG;
-		} else if (name == "fgimg_hovered") {
+		else if (name == "fgimg_hovered")
 			return FGIMG_HOVERED;
-		} else if (name == "fgimg_pressed") {
+		else if (name == "fgimg_pressed")
 			return FGIMG_PRESSED;
-		} else if (name == "alpha") {
+		else if (name == "alpha")
 			return ALPHA;
-		} else if (name == "content_offset") {
+		else if (name == "content_offset")
 			return CONTENT_OFFSET;
-		} else if (name == "padding") {
+		else if (name == "padding")
 			return PADDING;
-		} else if (name == "font") {
+		else if (name == "font")
 			return FONT;
-		} else if (name == "font_size") {
+		else if (name == "font_size")
 			return FONT_SIZE;
-		} else if (name == "colors") {
+		else if (name == "colors")
 			return COLORS;
-		} else if (name == "bordercolors") {
+		else if (name == "bordercolors")
 			return BORDERCOLORS;
-		} else if (name == "borderwidths") {
+		else if (name == "borderwidths")
 			return BORDERWIDTHS;
-		} else if (name == "sound") {
+		else if (name == "sound")
 			return SOUND;
-		} else if (name == "spacing") {
+		else if (name == "spacing")
 			return SPACING;
-		} else if (name == "size") {
+		else if (name == "size")
 			return SIZE;
-		} else {
+		else if (name == "up_arrow_bgimg")
+			return UP_ARROW_BGIMG;
+		else if (name == "down_arrow_bgimg")
+			return DOWN_ARROW_BGIMG;
+		else if (name == "thumb_bgimg")
+			return THUMB_BGIMG;
+		else
 			return NONE;
-		}
 	}
 
 	std::string get(Property prop, std::string def) const

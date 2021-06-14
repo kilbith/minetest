@@ -13,15 +13,19 @@ the arrow buttons where there is insufficient space.
 #pragma once
 
 #include "irrlichttypes_extrabloated.h"
+#include "StyleSpec.h"
 
 using namespace irr;
 using namespace gui;
+
+class ISimpleTextureSource;
 
 class GUIScrollBar : public IGUIElement
 {
 public:
 	GUIScrollBar(IGUIEnvironment *environment, IGUIElement *parent, s32 id,
-			core::rect<s32> rectangle, bool horizontal, bool auto_scale);
+			core::rect<s32> rectangle, bool horizontal, bool auto_scale,
+			ISimpleTextureSource *tsrc = nullptr);
 
 	enum ArrowVisibility
 	{
@@ -47,18 +51,27 @@ public:
 	void setPos(const s32 &pos);
 	void setPageSize(const s32 &size);
 	void setArrowsVisible(ArrowVisibility visible);
+	void setStyles(const std::array<StyleSpec, StyleSpec::NUM_STATES> &styles);
 
 private:
 	void refreshControls();
 	s32 getPosFromMousePos(const core::position2di &p) const;
 	f32 range() const { return f32(max_pos - min_pos); }
 
-	IGUIButton *up_button;
-	IGUIButton *down_button;
+	IGUIButton *up_button = nullptr;
+	IGUIButton *down_button = nullptr;
+
+	video::ITexture *m_up_arrow_texture = nullptr;
+	video::ITexture *m_down_arrow_texture = nullptr;
+	video::ITexture *m_thumb_texture = nullptr;
+	gui::IGUIImage  *m_thumb = nullptr;
+	video::ITexture *m_bg_texture = nullptr;
+	
 	ArrowVisibility arrow_visibility = DEFAULT;
 	bool is_dragging;
 	bool is_horizontal;
 	bool is_auto_scaling;
+	ISimpleTextureSource *m_tsrc = nullptr;
 	bool dragged_by_slider;
 	bool tray_clicked;
 	s32 scroll_pos;
@@ -74,4 +87,7 @@ private:
 
 	core::rect<s32> slider_rect;
 	video::SColor current_icon_color;
+
+protected:
+	ISimpleTextureSource *getTextureSource() const { return m_tsrc; }
 };
